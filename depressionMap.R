@@ -8,39 +8,28 @@ library(dplyr)
 library(gganimate)
 library(ggplot2)
 library(gridExtra)
+library(magick)
 library(magrittr)
 
 # Set working directory
-setwd('H:/TOOLS/R/Mapping Examples/BRFSS Trends')
+setwd('XXXXXXXXXXXXXXXX')
 
 # Import BRFSS Data
-csv.name <- 'Behavioral_Risk_Factor_Surveillance_System__BRFSS__Prevalence_Data__2011_to_present_.csv'
-df <- data.table(fread(file.path(getwd(), 'DATA', csv.name)), stringsAsFactors = F)
-
-# Limit to Depression Answers only
-clean.df <- df %>%
-    .[Class == 'Chronic Health Indicators' & 
-                 Topic == 'Depression' &
-                 Response == 'Yes' &
-                 Break_Out == 'Overall'
-                 # Year == 2017 & Locationabbr == 'OH'
-                 ,] %>%
-    .[, State := Locationabbr] %>%
-    .[, Confidence_Limit_Spread := Confidence_limit_High - Confidence_limit_Low]
+csv.name <- 'depression_data.csv'
+clean.df <- data.table(fread(csv.name), stringsAsFactors = F)
 
 # Get yearly Us average spread of the confidence limit    
 confLimit.df <- clean.df %>%
     .[, .(Mean_Confidence_Limit_Spread = mean(Confidence_Limit_Spread, na.rm = T)), by = list(Year)]
 
 # Import Map Data
-load('DATA/map_data/us50')
+load('us50')
 
 # Join Map Data to Depression Data
 map_obs <- left_join(us50, clean.df, by = c('id' = 'State')) %>%
     left_join(confLimit.df, by = c('Year'))
 
-
-# Build Plot of Confidence Limit Spread
+# Build Initial Plot of Confidence Limit Spread
 confSpreadPlot <- ggplot(map_obs)+
     geom_bar(aes(x = factor(Year), y = Mean_Confidence_Limit_Spread),
              stat = 'identity', fill = '#A3307EFF')+
@@ -96,6 +85,7 @@ myMap <- ggplot(data=map_obs)+
           legend.title = element_text(size = 14))
 # print(myMap)
 
+### BEGIN GIF WORK - MULTIPLE TAKES TO GET THIS RIGHT ###
 ### GIF:Take 1
 # Animate Map
 gifMap <- myMap + transition_states(Year)
@@ -152,8 +142,7 @@ build_GIF <- function(path = "H:/TOOLS/R/Mapping Examples/BRFSS Trends/FIGURES/d
 build_GIF()
 
 
-### GIF Part 2
-library(magick)
+### GIF: Take 3
 datalist <- split(map_obs, map_obs$Year)
 rm(img)
 img <- image_graph(1200, 750, res = 96)
@@ -198,5 +187,5 @@ out <- lapply(datalist, function(data){
 # dev.off()
 animation <- image_animate(img, fps = 0.5)
 print(animation)
-image_write(animation, "H:/TOOLS/R/Mapping Examples/BRFSS Trends/FIGURES/depressionMap(3).gif")
+image_write(animation, "depressionMap.gif")
 
