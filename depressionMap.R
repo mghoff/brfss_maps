@@ -94,7 +94,7 @@ rm(gifMap)
 
 ### GIF: Take 2
 # Inset barchart onto map and animate using SaveGIF({})
-build_GIF <- function(path = "H:/TOOLS/R/Mapping Examples/BRFSS Trends/FIGURES/depressionMap(2).gif", 
+build_GIF <- function(path = "/depressionMap(2).gif", 
                       width = 750, height = 450) {
     saveGIF({
         ani.options(interval = 1.5) # Set speed (smaller number is faster)
@@ -187,5 +187,5 @@ out <- lapply(datalist, function(data){
 # dev.off()
 animation <- image_animate(img, fps = 0.5)
 print(animation)
-image_write(animation, "depressionMap.gif")
+image_write(animation, "/depressionMap.gif")
 
