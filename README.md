@@ -1,4 +1,4 @@
 # brfss_maps
 mapped BRFSS data
 
-![](H:\TOOLS\R\Mapping Examples\BRFSS Trends\FIGURES\depressionMap(3).gif)
+![](https://github.com/mghoff/brfss_maps/blob/master/depressionMap(3).gif)
